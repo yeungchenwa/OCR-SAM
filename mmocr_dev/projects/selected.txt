@@ -1,3 +1,0 @@
-projects/ABCNet/README.md
-projects/ABCNet/README_V2.md
-projects/SPTS/README.md
