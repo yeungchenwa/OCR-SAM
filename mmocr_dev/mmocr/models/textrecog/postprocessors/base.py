@@ -107,16 +107,4 @@ class BaseTextRecogPostprocessor:
             pred_text.score = score
             pred_text.item = text
             data_samples[idx].pred_text = pred_text
-        with open(
-                'work_dirs/LAION400M/part-00001/recog_out/recog_results.jsonl',
-                'a') as f:
-            for data_sample in data_samples:
-                img_path = data_sample.img_path
-                pred_text = data_sample.pred_text.item
-                recog_score = data_sample.pred_text.score
-                info = dict(
-                    img_path=img_path,
-                    pred_text=pred_text,
-                    recog_score=recog_score)
-                f.write(json.dumps(info) + '\n')
         return data_samples

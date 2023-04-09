@@ -264,8 +264,6 @@ class MMOCRInferencer(BaseMMOCRInferencer):
 
         ori_inputs = self._inputs_to_list(inputs)
         # sort ori_inputs by the number in file name
-        ori_inputs = sorted(
-            ori_inputs, key=lambda x: int(x.split('/')[-1].split('.')[0][5:]))
         chunked_inputs = super(BaseMMOCRInferencer,
                                self)._get_chunk_data(ori_inputs, batch_size)
         results = {'predictions': [], 'visualization': []}

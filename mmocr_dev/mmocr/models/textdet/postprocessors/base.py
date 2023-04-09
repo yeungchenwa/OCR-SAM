@@ -5,10 +5,9 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import mmengine
 import numpy as np
-from torch import Tensor
-
 from mmocr.structures import TextDetDataSample
 from mmocr.utils import boundary_iou, rescale_polygons
+from torch import Tensor
 
 
 class BaseTextDetPostProcessor:
@@ -63,20 +62,6 @@ class BaseTextDetPostProcessor:
         pred_results = self.split_results(pred_results)
         process_single = partial(self._process_single, **cfg)
         results = list(map(process_single, pred_results, data_samples))
-        with open('work_dirs/LAION400M/part-00004/det_out/det_results.jsonl',
-                  'a') as f:
-            for result in results:
-                pred_instances = result.pred_instances
-                img_path = result.img_path.split('TextCLIP/data/')[1]
-                polygons = [
-                    polygon.astype(np.int32).reshape(-1).tolist()
-                    for polygon in pred_instances.polygons
-                ]
-                scores = pred_instances.scores.numpy().tolist()
-                info = dict(
-                    img_path=img_path, polygons=polygons, scores=scores)
-                # write to jsonl
-                f.write(json.dumps(info) + '\n')
         return results
 
     def _process_single(self, pred_result: Union[Tensor, List[Tensor]],
