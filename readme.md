@@ -1,1 +1,1 @@
-# # Develop SAM for OCR-related Application Demo
+# Develop SAM for OCR-related Application Demo
