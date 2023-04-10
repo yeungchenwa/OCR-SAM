@@ -12,8 +12,6 @@ from mmocr.apis.inferencers import MMOCRInferencer
 from mmocr.utils import poly2bbox
 # SAM
 from segment_anything import SamPredictor, sam_model_registry
-# diffusers
-from diffusers import StableDiffusionInpaintPipeline
 
 
 def parse_args():
@@ -22,12 +20,12 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'example_images/demo_EnsText2.jpg',
+        'example_images/ex2.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
         type=str,
-        default='results/erase2',
+        default='results/ex2',
         help='Output directory of results.')
     # MMOCR parser
     parser.add_argument(
@@ -77,9 +75,13 @@ def parse_args():
         "--show",
         action='store_true',
         help="whether to show the result")
-    args = parser.parse_args()
     # Diffusion Erase Model Parser
-
+    parser.add_argument(
+        "--diffusion_model",
+        type=str,
+        default='stable-diffusion', # Options: latent-diffusion, stable-diffusion
+        help="path to checkpoint file")
+    args = parser.parse_args()
     return args
 
 
@@ -126,8 +128,12 @@ def multi_mask2one_mask(masks):
 
 
 if __name__ == '__main__':
-    # Build MMOCR
     args = parse_args()
+
+    if args.diffusion_model == "stable-diffusion":
+        from diffusers import StableDiffusionInpaintPipeline
+
+    # Build MMOCR
     mmocr_inferencer = MMOCRInferencer(
         args.det,
         args.det_weights,

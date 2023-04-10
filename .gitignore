@@ -5,5 +5,6 @@ __pycache__/
 *.pth
 results/
 flagged/
+checkpoints/
 output.png
 test_out.png

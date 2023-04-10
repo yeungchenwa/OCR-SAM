@@ -9,7 +9,7 @@ from ldm.models.diffusion.ddim import DDIMSampler
 
 
 def make_batch(image, mask, device):
-    image = np.array(Image.open(image).convert("RGB"))
+    image = np.array(Image.open(image).convert("RGB")). # need to resize to a image_size
     image = image.astype(np.float32)/255.0
     image = image[None].transpose(0,3,1,2)
     image = torch.from_numpy(image)
@@ -36,12 +36,14 @@ if __name__ == "__main__":
         "--indir",
         type=str,
         nargs="?",
+        default="G:/Code/DLVC/opensource_repo/OCR-SAM/results/ldm_inpaint_input",
         help="dir containing image-mask pairs (`example.png` and `example_mask.png`)",
     )
     parser.add_argument(
         "--outdir",
         type=str,
         nargs="?",
+        default="G:/Code/DLVC/opensource_repo/OCR-SAM/results/ldm_inpaint_output",
         help="dir to write results to",
     )
     parser.add_argument(
@@ -53,6 +55,7 @@ if __name__ == "__main__":
     opt = parser.parse_args()
 
     masks = sorted(glob.glob(os.path.join(opt.indir, "*_mask.png")))
+    masks = [m.replace('\\', '/') for m in masks]
     images = [x.replace("_mask.png", ".png") for x in masks]
     print(f"Found {len(masks)} inputs.")
 
