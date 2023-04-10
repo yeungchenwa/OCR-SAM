@@ -22,7 +22,7 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'demo/demo_EnsText2.jpg',
+        'example_images/demo_EnsText2.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
@@ -79,7 +79,7 @@ def parse_args():
         help="whether to show the result")
     args = parser.parse_args()
     # Diffusion Erase Model Parser
-    
+
     return args
 
 
