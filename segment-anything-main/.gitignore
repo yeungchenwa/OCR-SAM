@@ -11,6 +11,7 @@ _ext
 build/
 dist/
 wheels/
+checkpoints/
 
 # pytorch/python/numpy formats
 *.pth
