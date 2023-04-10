@@ -12,6 +12,8 @@ from mmocr.apis.inferencers import MMOCRInferencer
 from mmocr.utils import poly2bbox
 # SAM
 from segment_anything import SamPredictor, sam_model_registry
+# Diffusion model
+from diffusers import StableDiffusionInpaintPipeline 
 
 
 def parse_args():
@@ -20,12 +22,12 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'example_images/ex2.jpg',
+        'example_images/ex3.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
         type=str,
-        default='results/ex2',
+        default='results/ex3',
         help='Output directory of results.')
     # MMOCR parser
     parser.add_argument(
@@ -130,9 +132,6 @@ def multi_mask2one_mask(masks):
 if __name__ == '__main__':
     args = parse_args()
 
-    if args.diffusion_model == "stable-diffusion":
-        from diffusers import StableDiffusionInpaintPipeline
-
     # Build MMOCR
     mmocr_inferencer = MMOCRInferencer(
         args.det,
@@ -147,7 +146,7 @@ if __name__ == '__main__':
 
     # Build Stable Diffusion Inpainting
     pipe = StableDiffusionInpaintPipeline.from_pretrained(
-            "runwayml/stable-diffusion-inpainting", torch_dtype=torch.float16
+            "diffusers/checkpoints/stable-diffusion-2-inpainting", torch_dtype=torch.float16 # runwayml/stable-diffusion-inpainting
         )
     pipe = pipe.to(args.device)
 
@@ -183,7 +182,7 @@ if __name__ == '__main__':
         )
         end = time.time()
         whole_mask = multi_mask2one_mask(masks=masks)
-        cv2.imwrite(os.path.join(args.outdir, f'whole_mask.png'), whole_mask)
+        # cv2.imwrite(os.path.join(args.outdir, f'whole_mask.png'), whole_mask)
         # Show result
         show_sam_result(img=img, 
                         masks=masks,
@@ -199,7 +198,7 @@ if __name__ == '__main__':
         #                         mode='L').convert("RGB").resize((512, 512))
         sd_mask_img = numpy2PIL(numpy_image=whole_mask[:, :, 0]).convert("RGB").resize((512, 512))
         
-        # sd_mask_img.save(os.path.join(args.outdir, f'pil_middle.png'))
+        sd_mask_img.save(os.path.join(args.outdir, f'whole_mask.png'))
 
         # Stable Diffusion for Erasing
         start = time.time()
