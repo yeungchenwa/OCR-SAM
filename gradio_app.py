@@ -1,6 +1,7 @@
 import cv2
 import gradio as gr
 import numpy as np
+import PIL.Image as Image
 import torch
 from matplotlib import pyplot as plt
 # MMOCR
@@ -8,6 +9,30 @@ from mmocr.apis.inferencers import MMOCRInferencer
 from mmocr.utils import poly2bbox
 # SAM
 from segment_anything import SamPredictor, sam_model_registry
+
+# Diffusers
+from diffusers import StableDiffusionInpaintPipeline
+
+
+det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'
+det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
+rec_config = 'mmocr_dev/configs/textrecog/unirec/unirec.py'
+rec_weight = 'mmocr_dev/checkpoints/unirec.pth'
+sam_checkpoint = 'segment-anything-main/checkpoints/sam_vit_h_4b8939.pth'
+device = 'cuda'
+sam_type = 'vit_h'
+
+# BUILD MMOCR
+mmocr_inferencer = MMOCRInferencer(
+        det_config, det_weight, rec_config, rec_weight, device=device)
+# Build SAM
+sam = sam_model_registry[sam_type](checkpoint=sam_checkpoint)
+sam_predictor = SamPredictor(sam)
+
+# Build Diffusers
+pipe = StableDiffusionInpaintPipeline.from_pretrained(
+    "runwayml/stable-diffusion-inpainting", torch_dtype=torch.float16)
+pipe = pipe.to("cuda")
 
 
 def show_mask(mask, ax, random_color=False):
@@ -20,22 +45,9 @@ def show_mask(mask, ax, random_color=False):
     ax.imshow(mask_image)
 
 
-det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'
-det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
-rec_config = 'mmocr_dev/configs/textrecog/unirec/unirec.py'
-rec_weight = 'mmocr_dev/checkpoints/unirec.pth'
-sam_checkpoint = 'segment-anything-main/checkpoints/sam_vit_h_4b8939.pth'
-
 
 def run_mmocr_sam(
     img: np.ndarray,
-    det_config: str = det_config,
-    det_weight: str = det_weight,
-    rec_config: str = rec_config,
-    rec_weight: str = rec_weight,
-    sam_checkpoint: str = sam_checkpoint,
-    sam_type: str = 'vit_h',
-    device: str = 'cuda',
 ):
     """Run MMOCR and SAM
 
@@ -55,12 +67,8 @@ def run_mmocr_sam(
         device (str): Device used for inference. Defaults to 'cuda'.
     """
     # Build MMOCR
-    mmocr_inferencer = MMOCRInferencer(
-        det_config, det_weight, rec_config, rec_weight, device=device)
-    # Build SAM
-    sam = sam_model_registry[sam_type](checkpoint=sam_checkpoint)
-    sam_predictor = SamPredictor(sam)
-    result = mmocr_inferencer(img, )['predictions'][0]
+    
+    result = mmocr_inferencer(img)['predictions'][0]
     rec_texts = result['rec_texts']
     det_polygons = result['det_polygons']
     det_bboxes = torch.tensor([poly2bbox(poly) for poly in det_polygons],
@@ -82,7 +90,7 @@ def run_mmocr_sam(
     # convert img to RGB
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     plt.imshow(img)
-    outputs = []
+    outputs = {}
     output_str = ''
     for idx, (mask, rec_text, polygon, bbox) in enumerate(
             zip(masks, rec_texts, det_polygons, det_bboxes)):
@@ -90,12 +98,7 @@ def run_mmocr_sam(
         polygon = np.array(polygon).reshape(-1, 2)
         # convert polygon to closed polygon
         polygon = np.concatenate([polygon, polygon[:1]], axis=0)
-        plt.plot(
-            polygon[:, 0],
-            polygon[:, 1],
-            '--',
-            color='b',
-            linewidth=4)
+        plt.plot(polygon[:, 0], polygon[:, 1], '--', color='b', linewidth=4)
         # plot text on the left top corner of the polygon
         text_string = f'idx:{idx}, {rec_text}'
         plt.text(
@@ -106,9 +109,7 @@ def run_mmocr_sam(
             fontsize=15,
         )
         output_str += f'{idx}:{rec_text}' + '\n'
-        outputs.append({
-            'idx':idx,
-            'mask':mask})
+        outputs[idx] = mask.cpu().numpy().tolist()
     plt.savefig('output.png')
     # convert plt to numpy
     img = cv2.cvtColor(
@@ -127,7 +128,20 @@ def run_downstream(img: np.ndarray, mask_results, index: str, prompt: str):
         task (str): Downstream task selected
         prompt (str): Inpainting prompt
     """
-    mask = mask_results[int(index)]['mask']
+    # Diffuser
+    mask_results = eval(mask_results)
+    mask = np.array(mask_results[int(index)][0])
+    mask = Image.fromarray(mask)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = Image.fromarray(img)
+    image = pipe(
+        prompt=prompt,
+        image=img.resize((512, 512)),
+        mask_image=mask.resize((512, 512))).images[0]
+    image = np.array(image)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    return image
+
 
 if __name__ == '__main__':
 
@@ -139,8 +153,7 @@ if __name__ == '__main__':
                 mask_results = gr.Textbox(label='Mask Results')
                 mmocr_sam = gr.Button('Run MMOCR and SAM')
                 text_index = gr.Textbox(label='Select Text Index')
-                prompt = gr.Textbox(
-                    label='Inpainting Prompt')
+                prompt = gr.Textbox(label='Inpainting Prompt')
                 downstream = gr.Button('Run Downstream Tasks')
             with gr.Column(scale=1):
                 output_image = gr.Image(label='Output Image')
