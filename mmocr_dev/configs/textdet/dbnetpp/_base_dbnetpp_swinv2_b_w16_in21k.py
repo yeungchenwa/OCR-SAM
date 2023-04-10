@@ -18,7 +18,11 @@ model = dict(
         in_channels=256,
         module_loss=dict(type='DBModuleLoss'),
         postprocessor=dict(
-            type='DBPostprocessor', text_repr_type='quad',
+            type='DBPostprocessor',
+            text_repr_type='quad',
+            mask_thr=0.5,
+            min_text_score=0.5,
+            min_text_width=15,
             epsilon_ratio=0.002)),
     data_preprocessor=dict(
         type='TextDetDataPreprocessor',

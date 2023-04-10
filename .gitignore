@@ -4,3 +4,6 @@ __pycache__/
 *.ipynb
 *.pth
 results/
+flagged/
+output.png
+test_out.png
