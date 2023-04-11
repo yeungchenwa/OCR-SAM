@@ -11,10 +11,9 @@ from mmocr.utils import poly2bbox
 from segment_anything import SamPredictor, sam_model_registry
 
 # Diffusers
-from diffusers import StableDiffusionInpaintPipeline
+from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
 
-
-det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'
+det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
 det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
 rec_config = 'mmocr_dev/configs/textrecog/unirec/unirec.py'
 rec_weight = 'mmocr_dev/checkpoints/unirec.pth'
@@ -24,14 +23,18 @@ sam_type = 'vit_h'
 
 # BUILD MMOCR
 mmocr_inferencer = MMOCRInferencer(
-        det_config, det_weight, rec_config, rec_weight, device=device)
+    det_config, det_weight, rec_config, rec_weight, device=device)
 # Build SAM
 sam = sam_model_registry[sam_type](checkpoint=sam_checkpoint)
 sam_predictor = SamPredictor(sam)
 
 # Build Diffusers
-pipe = StableDiffusionInpaintPipeline.from_pretrained(
-    "runwayml/stable-diffusion-inpainting", torch_dtype=torch.float16)
+controlnet = ControlNetModel.from_pretrained(
+    "lllyasviel/sd-controlnet-seg", torch_dtype=torch.float16)
+pipe = StableDiffusionControlNetPipeline.from_pretrained(
+    "runwayml/stable-diffusion-v1-5",
+    controlnet=controlnet,
+    torch_dtype=torch.float16)
 pipe = pipe.to("cuda")
 
 
@@ -45,10 +48,7 @@ def show_mask(mask, ax, random_color=False):
     ax.imshow(mask_image)
 
 
-
-def run_mmocr_sam(
-    img: np.ndarray,
-):
+def run_mmocr_sam(img: np.ndarray, ):
     """Run MMOCR and SAM
 
     Args:
@@ -67,7 +67,7 @@ def run_mmocr_sam(
         device (str): Device used for inference. Defaults to 'cuda'.
     """
     # Build MMOCR
-    
+
     result = mmocr_inferencer(img)['predictions'][0]
     rec_texts = result['rec_texts']
     det_polygons = result['det_polygons']
@@ -109,7 +109,8 @@ def run_mmocr_sam(
             fontsize=15,
         )
         output_str += f'{idx}:{rec_text}' + '\n'
-        outputs[idx] = mask.cpu().numpy().tolist()
+        outputs[idx] = dict(
+            mask=mask.cpu().numpy().tolist(), polygon=polygon.tolist())
     plt.savefig('output.png')
     # convert plt to numpy
     img = cv2.cvtColor(
@@ -130,17 +131,29 @@ def run_downstream(img: np.ndarray, mask_results, index: str, prompt: str):
     """
     # Diffuser
     mask_results = eval(mask_results)
-    mask = np.array(mask_results[int(index)][0])
+    mask = np.array(mask_results[int(index)]['mask'][0])
+    # covert mask to binary mask
+    mask = (mask > 0.5).astype(np.uint8)
+    # convert mask to three channels
+    mask = np.stack([mask, mask, mask], axis=-1)
     mask = Image.fromarray(mask)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
-    image = pipe(
+    original_size = img.size
+    generator = torch.manual_seed(0)
+    diff_result = pipe(
         prompt=prompt,
-        image=img.resize((512, 512)),
-        mask_image=mask.resize((512, 512))).images[0]
-    image = np.array(image)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    return image
+        num_inference_steps=20,
+        generator=generator,
+        image=mask.resize((512, 512))).images[0]
+    masked_diff_result = Image.fromarray(
+        np.array(diff_result) * np.array(mask.resize(
+            (512, 512)))).resize(original_size)
+    # img + masked_diff_result
+    img = Image.fromarray(np.array(img) + np.array(masked_diff_result))
+    img = np.array(img)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    return img
 
 
 if __name__ == '__main__':
@@ -150,7 +163,7 @@ if __name__ == '__main__':
             with gr.Column(scale=1):
                 input_image = gr.Image(label='Input Image')
                 sam_results = gr.Textbox(label='Detection Results')
-                mask_results = gr.Textbox(label='Mask Results')
+                mask_results = gr.Textbox(label='Mask Results', max_lines=2)
                 mmocr_sam = gr.Button('Run MMOCR and SAM')
                 text_index = gr.Textbox(label='Select Text Index')
                 prompt = gr.Textbox(label='Inpainting Prompt')
@@ -174,4 +187,4 @@ if __name__ == '__main__':
                 inputs=[input_image, mask_results, text_index, prompt],
                 outputs=[output_image])
 
-    demo.launch()
+    demo.launch(debug=True)
