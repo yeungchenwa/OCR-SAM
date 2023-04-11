@@ -136,31 +136,21 @@ def run_downstream(img: np.ndarray, mask_results, index: str, prompt: str):
     mask = (mask > 0.5).astype(np.uint8)
     # convert mask to three channels
     mask = np.stack([mask, mask, mask], axis=-1)
-    polygon = np.array(mask_results[int(index)]['polygon'])
     mask = Image.fromarray(mask)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
-    # crop img and mask
-    # polygon = polygon.reshape(-1).astype(np.int32)
-    # polygon = polygon.reshape(-1, 2)
-    # x, y, w, h = cv2.boundingRect(polygon)
-    # croped_img = img.crop((x, y, x + w, y + h))
-    # croped_mask = mask.crop((x, y, x + w, y + h))
-    # # diffuser
-    # croped_img_diff = pipe(
-    #     prompt=prompt,
-    #     image=croped_img.resize((512, 512)),
-    #     mask_image=croped_mask.resize((512, 512))).images[0]
+    original_size = img.size
     generator = torch.manual_seed(0)
-    img = pipe(
+    diff_result = pipe(
         prompt=prompt,
         num_inference_steps=20,
         generator=generator,
         image=mask.resize((512, 512))).images[0]
-    # reshape croped_img_diff to the original size
-    # croped_img_diff = croped_img_diff.resize((w, h))
-    # paste croped_img_diff to the original image
-    # img.paste(croped_img_diff, (x, y))
+    masked_diff_result = Image.fromarray(
+        np.array(diff_result) * np.array(mask.resize(
+            (512, 512)))).resize(original_size)
+    # img + masked_diff_result
+    img = Image.fromarray(np.array(img) + np.array(masked_diff_result))
     img = np.array(img)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     return img
