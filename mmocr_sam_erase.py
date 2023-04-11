@@ -26,12 +26,12 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'example_images/erase_4.jpg',
+        'example_images/erase_1.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
         type=str,
-        default='results/erase_4',
+        default='results/erase_1_sam_dilated_iter2_5x5',
         help='Output directory of results.')
     # MMOCR parser
     parser.add_argument(
@@ -68,7 +68,7 @@ def parse_args():
     parser.add_argument(
         "--use_sam",
         type=bool,
-        default=False,
+        default=True,
         help='Whether to use SAM to segment the character. If you use the '
             'latent-diffusion for erasing, don\'t use the sam can greatly improve '
             'the erasing quality.')
@@ -82,6 +82,11 @@ def parse_args():
         type=str,
         default='vit_h',
         help="path to checkpoint file")
+    parser.add_argument(
+        "--dilate_iteration",
+        type=int,
+        default=2,
+        help="The dilate iteration to dilate the SAM ouput mask")
     parser.add_argument(
         "--show",
         action='store_true',
@@ -153,7 +158,6 @@ def multi_mask2one_mask(masks):
         mask_image = mask.cpu().numpy().reshape(h, w, 1)
         whole_mask = mask_image if i == 0 else whole_mask + mask_image
     whole_mask = np.where(whole_mask==False, 0, 255)
-    whole_mask = np.concatenate([whole_mask, whole_mask, whole_mask], axis=2) # three channels
     return whole_mask
 
 
@@ -224,7 +228,11 @@ if __name__ == '__main__':
                 multimask_output=False,
             )
             end = time.time()
-            whole_mask = multi_mask2one_mask(masks=masks)
+            ori_mask = multi_mask2one_mask(masks=masks)
+            # Dilate the mask region to promote the following erasing quality
+            mask_img = ori_mask[:, :, 0].astype('uint8')
+            kernel = np.ones((5, 5), np.int8)
+            whole_mask = cv2.dilate(mask_img, kernel, iterations=args.dilate_iteration)
             cv2.imwrite(os.path.join(args.outdir, f'whole_mask.jpg'), whole_mask)
             # Show result
             show_sam_result(img=img, 
