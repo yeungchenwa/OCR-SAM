@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 # MMOCR
 from mmocr.apis.inferencers import MMOCRInferencer
 from mmocr.utils import poly2bbox
+from mmocr.utils.polygon_utils import offset_polygon
 # SAM
 from segment_anything import SamPredictor, sam_model_registry
 # Diffusion model
@@ -25,12 +26,12 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'example_images/erase_2.jpg',
+        'example_images/erase_4.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
         type=str,
-        default='results/erase_2',
+        default='results/erase_4',
         help='Output directory of results.')
     # MMOCR parser
     parser.add_argument(
@@ -55,7 +56,6 @@ def parse_args():
     parser.add_argument(
         '--rec-weights',
         type=str,
-        # required=True,
         default='mmocr_dev/checkpoints/unirec.pth',
         help='Path to the custom checkpoint file of the selected recog model.')
     parser.add_argument(
@@ -66,9 +66,15 @@ def parse_args():
         'If not specified, the available device will be automatically used.')
     # SAM Parser
     parser.add_argument(
+        "--use_sam",
+        type=bool,
+        default=False,
+        help='Whether to use SAM to segment the character. If you use the '
+            'latent-diffusion for erasing, don\'t use the sam can greatly improve '
+            'the erasing quality.')
+    parser.add_argument(
         "--sam_checkpoint",
         type=str,
-        # required=True,
         default='segment-anything-main/checkpoints/sam_vit_h_4b8939.pth',
         help="path to checkpoint file")
     parser.add_argument(
@@ -95,7 +101,7 @@ def parse_args():
     parser.add_argument(
         "--img_size",
         type=tuple,
-        default=(768, 768),
+        default=(512, 512),
         help='If use latetn-diffusion for erasing, set the ldm-inpainting '
             'image size, also if want to use original size, set `None`')
     parser.add_argument(
@@ -163,8 +169,9 @@ if __name__ == '__main__':
         device=args.device)
     
     # Build SAM
-    sam = sam_model_registry[args.sam_type](checkpoint=args.sam_checkpoint)
-    sam_predictor = SamPredictor(sam)
+    if args.use_sam:
+        sam = sam_model_registry[args.sam_type](checkpoint=args.sam_checkpoint)
+        sam_predictor = SamPredictor(sam)
 
     if args.diffusion_model == "stable-diffusion":
         # Build Stable Diffusion Inpainting
@@ -198,38 +205,50 @@ if __name__ == '__main__':
         end = time.time()
         rec_texts = result['rec_texts']
         det_polygons = result['det_polygons']
-        det_bboxes = torch.tensor([poly2bbox(poly) for poly in det_polygons],
-                                  device=sam_predictor.device)
-        transformed_boxes = sam_predictor.transform.apply_boxes_torch(
-            det_bboxes, img.shape[:2])
         print(f"The MMOCR for detecting the text has finished, costing time {end-start}s")
         
-        # SAM inference
-        start = time.time()
-        sam_predictor.set_image(img, image_format='BGR')
-        masks, _, _ = sam_predictor.predict_torch(
-            point_coords=None,
-            point_labels=None,
-            boxes=transformed_boxes,
-            multimask_output=False,
-        )
-        end = time.time()
-        whole_mask = multi_mask2one_mask(masks=masks)
-        cv2.imwrite(os.path.join(args.outdir, f'whole_mask.jpg'), whole_mask)
-        # Show result
-        show_sam_result(img=img, 
-                        masks=masks,
-                        rec_texts=rec_texts,
-                        det_polygons=det_polygons,
-                        args=args)
-        print(f"The SAM for segment the text has finished, costing time {end-start}s")
-
         h, w, c = img.shape
+        if args.use_sam:
+            # Transform the bbox
+            det_bboxes = torch.tensor([poly2bbox(poly) for poly in det_polygons],
+                                  device=sam_predictor.device)
+            transformed_boxes = sam_predictor.transform.apply_boxes_torch(
+            det_bboxes, img.shape[:2])
+            # SAM inference
+            start = time.time()
+            sam_predictor.set_image(img, image_format='BGR')
+            masks, _, _ = sam_predictor.predict_torch(
+                point_coords=None,
+                point_labels=None,
+                boxes=transformed_boxes,
+                multimask_output=False,
+            )
+            end = time.time()
+            whole_mask = multi_mask2one_mask(masks=masks)
+            cv2.imwrite(os.path.join(args.outdir, f'whole_mask.jpg'), whole_mask)
+            # Show result
+            show_sam_result(img=img, 
+                            masks=masks,
+                            rec_texts=rec_texts,
+                            det_polygons=det_polygons,
+                            args=args)
+            print(f"The SAM for segment the text has finished, costing time {end-start}s")
+        else:
+            whole_mask = np.zeros((h, w, c), np.uint8)
+            for polygon in det_polygons:
+                # expand the polygon with distance 0.1
+                expand_poly = offset_polygon(poly=polygon,
+                                             distance=4).tolist()
+                px = [int(expand_poly[i]) for i in range(0, len(expand_poly), 2)]
+                py = [int(expand_poly[i]) for i in range(1, len(expand_poly), 2)]
+                poly = [[x, y] for x, y in zip(px, py)]
+                cv2.fillPoly(whole_mask, [np.array(poly)], (255, 255, 255))
+            cv2.imwrite(os.path.join(args.outdir, f'whole_mask.jpg'), whole_mask)
+
         if args.diffusion_model == "stable-diffusion":
             # Data preparation
             sd_img = Image.open(ori_input).convert("RGB").resize((512, 512))
             sd_mask_img = numpy2PIL(numpy_image=whole_mask).convert("RGB").resize((512, 512))
-            
             # sd_mask_img.save(os.path.join(args.outdir, f'whole_mask.png'))
 
             # Stable Diffusion for Erasing
