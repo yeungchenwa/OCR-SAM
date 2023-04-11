@@ -14,7 +14,7 @@ from mmocr.utils import poly2bbox
 from segment_anything import SamPredictor, sam_model_registry
 # Diffusion model
 from diffusers import StableDiffusionInpaintPipeline 
-
+# from latent_diffusion.ldm_erase_text import erase_text
 
 def parse_args():
     parser = ArgumentParser()
@@ -22,12 +22,12 @@ def parse_args():
         '--inputs',
         type=str,
         default=
-        'example_images/ex3.jpg',
+        'example_images/1003.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',
         type=str,
-        default='results/ex3',
+        default='results/1003',
         help='Output directory of results.')
     # MMOCR parser
     parser.add_argument(
@@ -144,11 +144,12 @@ if __name__ == '__main__':
     sam = sam_model_registry[args.sam_type](checkpoint=args.sam_checkpoint)
     sam_predictor = SamPredictor(sam)
 
-    # Build Stable Diffusion Inpainting
-    pipe = StableDiffusionInpaintPipeline.from_pretrained(
-            "diffusers/checkpoints/stable-diffusion-2-inpainting", torch_dtype=torch.float16 # runwayml/stable-diffusion-inpainting
-        )
-    pipe = pipe.to(args.device)
+    if args.diffusion_model == "stable-diffusion":
+        # Build Stable Diffusion Inpainting
+        pipe = StableDiffusionInpaintPipeline.from_pretrained(
+                "diffusers/checkpoints/stable-diffusion-2-inpainting", torch_dtype=torch.float16 # runwayml/stable-diffusion-inpainting
+            )
+        pipe = pipe.to(args.device)
 
     # Run
     if not os.path.exists(args.outdir):
@@ -191,20 +192,17 @@ if __name__ == '__main__':
                         args=args)
         print(f"The SAM for segment the text has finished, costing time {end-start}s")
 
-        # Data preparation
-        sd_img = Image.open(ori_input).convert("RGB").resize((512, 512))
-        # sd_mask_img = Image.open(os.path.join(args.outdir, f'whole_mask.png')).convert("RGB").resize((512, 512))
-        # sd_mask_img = numpy2PIL(numpy_image=whole_mask, 
-        #                         mode='L').convert("RGB").resize((512, 512))
-        sd_mask_img = numpy2PIL(numpy_image=whole_mask[:, :, 0]).convert("RGB").resize((512, 512))
-        
-        sd_mask_img.save(os.path.join(args.outdir, f'whole_mask.png'))
+        if args.diffusion_model == "stable-diffusion":
+            # Data preparation
+            sd_img = Image.open(ori_input).convert("RGB").resize((512, 512))
+            sd_mask_img = numpy2PIL(numpy_image=whole_mask[:, :, 0]).convert("RGB").resize((512, 512))
+            
+            sd_mask_img.save(os.path.join(args.outdir, f'whole_mask.png'))
 
-        # Stable Diffusion for Erasing
-        start = time.time()
-        prompt = "There is no text in the scene"
-        image = pipe(prompt=prompt, image=sd_img, mask_image=sd_mask_img).images[0]
-        end = time.time()
-        image.save(os.path.join(args.outdir, f'erase_output.png'))
-        print(f"The Stable Diffusion for erasing the text has finished, costing time {end-start}")
-        
+            # Stable Diffusion for Erasing
+            start = time.time()
+            prompt = "no text, no object"
+            image = pipe(prompt=prompt, image=sd_img, mask_image=sd_mask_img).images[0]
+            end = time.time()
+            image.save(os.path.join(args.outdir, f'erase_output.png'))
+            print(f"The Stable Diffusion for erasing the text has finished, costing time {end-start}")
