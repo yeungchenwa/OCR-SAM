@@ -158,7 +158,7 @@ def run_erase(img: np.ndarray, mask_results, indexs: str, diffusion_type: str,
         # Dilate the mask region to promote the following erasing quality
         mask_img = ori_mask[:, :, 0].astype('uint8')
         kernel = np.ones((5, 5), np.int8)
-        whole_mask = cv2.dilate(mask_img, kernel, iterations=dilate_iter)
+        whole_mask = cv2.dilate(mask_img, kernel, iterations=int(dilate_iter))
     elif mask_type == 'MMOCR':
         whole_mask = np.zeros((h, w, c), np.uint8)
         for polygon in selected_polygons:
@@ -196,8 +196,10 @@ def run_erase(img: np.ndarray, mask_results, indexs: str, diffusion_type: str,
             mask_pil_img=mask_img,
             model=model,
             device='cuda',
+            opt=None,
             img_size=(512, 512),
             steps=50)
+        result_img = result_img.resize(ori_img_size)
 
     result_img = cv2.cvtColor(np.array(result_img), cv2.COLOR_RGB2BGR)
     return result_img
@@ -222,9 +224,10 @@ if __name__ == '__main__':
                 mask_type = gr.Radio(
                     choices=['SAM', 'MMOCR'], label='Mask Type')
                 dilate_iter = gr.Slider(
-                    0,
+                    1,
                     5,
-                    value=1,
+                    value=2,
+                    step=1,
                     label='The dilate iteration to dilate the SAM ouput mask',
                 )
                 downstream = gr.Button('Run Erasing')
