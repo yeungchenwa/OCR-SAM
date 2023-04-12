@@ -42,14 +42,15 @@ def parse_args():
     parser.add_argument(
         '--rec',
         type=str,
-        default='mmocr_dev/configs/textrecog/unirec/unirec.py',
+        default='mmocr_dev/configs/textrecog/abinet/abinet_20e_st-an_mj.py',
         help='Pretrained text recognition algorithm. It\'s the path to the '
         'config file or the model name defined in metafile.')
     parser.add_argument(
         '--rec-weights',
         type=str,
         # required=True,
-        default='mmocr_dev/checkpoints/unirec.pth',
+        default=
+        'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth',
         help='Path to the custom checkpoint file of the selected recog model.')
     parser.add_argument(
         '--device',
@@ -70,9 +71,7 @@ def parse_args():
         default='vit_h',
         help="path to checkpoint file")
     parser.add_argument(
-        "--show",
-        action='store_true',
-        help="whether to show the result")
+        "--show", action='store_true', help="whether to show the result")
     args = parser.parse_args()
     return args
 
@@ -85,6 +84,7 @@ def show_mask(mask, ax, random_color=False):
     h, w = mask.shape[-2:]
     mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
     ax.imshow(mask_image)
+
 
 if __name__ == '__main__':
     # Build MMOCR
