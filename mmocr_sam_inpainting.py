@@ -10,10 +10,10 @@ from segment_anything import SamPredictor, sam_model_registry
 from diffusers import StableDiffusionInpaintPipeline
 
 if __name__ == '__main__':
-    det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'
+    det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
     det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
-    rec_config = 'mmocr_dev/configs/textrecog/unirec/unirec.py'
-    rec_weight = 'mmocr_dev/checkpoints/unirec.pth'
+    rec_config = 'mmocr_dev/configs/textrecog/abinet/abinet_20e_st-an_mj.py'
+    rec_weight = 'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
     sam_checkpoint = 'segment-anything-main/checkpoints/sam_vit_h_4b8939.pth'
     prompt = 'Text like a cake'
     sam_type = 'vit_h'
