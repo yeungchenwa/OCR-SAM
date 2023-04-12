@@ -11,7 +11,7 @@ from mmocr.utils import poly2bbox
 from segment_anything import SamPredictor, sam_model_registry
 
 # Diffusers
-from diffusers import StableDiffusionControlNetPipeline, ControlNetModel
+from diffusers import StableDiffusionInpaintPipeline
 
 det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
 det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
@@ -29,12 +29,8 @@ sam = sam_model_registry[sam_type](checkpoint=sam_checkpoint)
 sam_predictor = SamPredictor(sam)
 
 # Build Diffusers
-controlnet = ControlNetModel.from_pretrained(
-    "lllyasviel/sd-controlnet-seg", torch_dtype=torch.float16)
-pipe = StableDiffusionControlNetPipeline.from_pretrained(
-    "runwayml/stable-diffusion-v1-5",
-    controlnet=controlnet,
-    torch_dtype=torch.float16)
+pipe = StableDiffusionInpaintPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-2-inpainting", torch_dtype=torch.float16)
 pipe = pipe.to("cuda")
 
 
@@ -132,28 +128,19 @@ def run_downstream(img: np.ndarray, mask_results, index: str, prompt: str):
     # Diffuser
     mask_results = eval(mask_results)
     mask = np.array(mask_results[int(index)]['mask'][0])
-    # covert mask to binary mask
-    mask = (mask > 0.5).astype(np.uint8)
-    # convert mask to three channels
-    mask = np.stack([mask, mask, mask], axis=-1)
     mask = Image.fromarray(mask)
+    mask.save('mask.png')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
-    original_size = img.size
-    generator = torch.manual_seed(0)
-    diff_result = pipe(
-        prompt=prompt,
-        num_inference_steps=20,
-        generator=generator,
-        image=mask.resize((512, 512))).images[0]
-    masked_diff_result = Image.fromarray(
-        np.array(diff_result) * np.array(mask.resize(
-            (512, 512)))).resize(original_size)
-    # img + masked_diff_result
-    img = Image.fromarray(np.array(img) + np.array(masked_diff_result))
-    img = np.array(img)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    return img
+    ori_img_size = img.size
+    # resize image and mask to 512x512
+    img = img.resize((512, 512))
+    mask = mask.resize((512, 512))
+    diff_result = pipe(prompt=prompt, image=img, mask_image=mask).images[0]
+    diff_result = diff_result.resize(ori_img_size)
+    diff_result = np.array(diff_result)
+    diff_result = cv2.cvtColor(diff_result, cv2.COLOR_RGB2BGR)
+    return diff_result
 
 
 if __name__ == '__main__':

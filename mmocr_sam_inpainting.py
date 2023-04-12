@@ -29,7 +29,7 @@ if __name__ == '__main__':
     sam_predictor = SamPredictor(sam)
     # Diffuser
     pipe = StableDiffusionInpaintPipeline.from_pretrained(
-        "runwayml/stable-diffusion-inpainting", torch_dtype=torch.float16)
+        "stabilityai/stable-diffusion-2-inpainting", torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
     img = cv2.imread(img_path)
     result = mmocr_inferencer(img)['predictions'][0]
@@ -50,11 +50,12 @@ if __name__ == '__main__':
     # Diffuser inference
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img)
-
+    ori_img_size = img.size
     mask = masks[select_index][0].cpu().numpy()
     mask = Image.fromarray(mask)
     image = pipe(
         prompt=prompt,
         image=img.resize((512, 512)),
         mask_image=mask.resize((512, 512))).images[0]
+    image = image.resize(ori_img_size)
     image.save('test_out.png')
