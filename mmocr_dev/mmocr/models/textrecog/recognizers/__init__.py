@@ -12,10 +12,9 @@ from .sar import SARNet
 from .satrn import SATRN
 from .stacking import StackingRecognizer
 from .svtr import SVTR
-from .unirec import UniRec
 
 __all__ = [
     'BaseRecognizer', 'EncoderDecoderRecognizer', 'CRNN', 'SARNet', 'NRTR',
     'RobustScanner', 'SATRN', 'ABINet', 'MASTER', 'SVTR', 'ASTER',
-    'EncoderDecoderRecognizerTTAModel', 'UniRec', 'StackingRecognizer'
+    'EncoderDecoderRecognizerTTAModel', 'StackingRecognizer'
 ]
