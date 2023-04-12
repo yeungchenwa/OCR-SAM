@@ -9,9 +9,13 @@ from mmocr.apis.inferencers import MMOCRInferencer
 from mmocr.utils import poly2bbox
 # SAM
 from segment_anything import SamPredictor, sam_model_registry
-
-# Diffusers
+# Diffusion model
 from diffusers import StableDiffusionInpaintPipeline
+from mmocr.utils.polygon_utils import offset_polygon
+import sys
+
+sys.path.append('latent_diffusion')
+from latent_diffusion.ldm_erase_text import erase_text_from_image, instantiate_from_config, OmegaConf
 
 det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
 det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
@@ -28,10 +32,19 @@ mmocr_inferencer = MMOCRInferencer(
 sam = sam_model_registry[sam_type](checkpoint=sam_checkpoint)
 sam_predictor = SamPredictor(sam)
 
-# Build Diffusers
-pipe = StableDiffusionInpaintPipeline.from_pretrained(
-    "stabilityai/stable-diffusion-2-inpainting", torch_dtype=torch.float16)
-pipe = pipe.to("cuda")
+
+def multi_mask2one_mask(masks):
+    _, _, h, w = masks.shape
+    for i, mask in enumerate(masks):
+        mask_image = mask.reshape(h, w, 1)
+        whole_mask = mask_image if i == 0 else whole_mask + mask_image
+    whole_mask = np.where(whole_mask == False, 0, 255)
+    return whole_mask
+
+
+def numpy2PIL(numpy_image):
+    out = Image.fromarray(numpy_image.astype(np.uint8))
+    return out
 
 
 def show_mask(mask, ax, random_color=False):
@@ -115,32 +128,79 @@ def run_mmocr_sam(img: np.ndarray, ):
     return img, output_str, outputs
 
 
-def run_downstream(img: np.ndarray, mask_results, index: str, prompt: str):
-    """Run downstream tasks
+def run_erase(img: np.ndarray, mask_results, indexs: str, diffusion_type: str,
+              mask_type: str, dilate_iter: int):
+    """Run erase task
 
     Args:
         img (np.ndarray): Input image
         mask_results (str): Mask results from SAM
-        index (str): Index of the selected text
-        task (str): Downstream task selected
-        prompt (str): Inpainting prompt
+        indexs (str): Index of the selected text
+        diffusion_type (str): Type of the selected diffusion model.
+        mask_type (str): Type of the selected mask model.
     """
     # Diffuser
     mask_results = eval(mask_results)
-    mask = np.array(mask_results[int(index)]['mask'][0])
-    mask = Image.fromarray(mask)
-    mask.save('mask.png')
+    indexs = [int(idx) for idx in indexs.split(',')]
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    h, w, c, = img.shape
     img = Image.fromarray(img)
     ori_img_size = img.size
-    # resize image and mask to 512x512
-    img = img.resize((512, 512))
-    mask = mask.resize((512, 512))
-    diff_result = pipe(prompt=prompt, image=img, mask_image=mask).images[0]
-    diff_result = diff_result.resize(ori_img_size)
-    diff_result = np.array(diff_result)
-    diff_result = cv2.cvtColor(diff_result, cv2.COLOR_RGB2BGR)
-    return diff_result
+    selected_mask = []
+    selected_polygons = []
+    for idx in indexs:
+        selected_mask.append(np.array(mask_results[idx]['mask']))
+        selected_polygons.append(np.array(mask_results[idx]['polygon']))
+    selected_mask = np.stack(selected_mask, axis=0)
+
+    if mask_type == 'SAM':
+        ori_mask = multi_mask2one_mask(masks=selected_mask)
+        # Dilate the mask region to promote the following erasing quality
+        mask_img = ori_mask[:, :, 0].astype('uint8')
+        kernel = np.ones((5, 5), np.int8)
+        whole_mask = cv2.dilate(mask_img, kernel, iterations=dilate_iter)
+    elif mask_type == 'MMOCR':
+        whole_mask = np.zeros((h, w, c), np.uint8)
+        for polygon in selected_polygons:
+            # expand the polygon with distance 0.1
+            expand_poly = offset_polygon(poly=polygon, distance=4).tolist()
+            px = [int(expand_poly[i]) for i in range(0, len(expand_poly), 2)]
+            py = [int(expand_poly[i]) for i in range(1, len(expand_poly), 2)]
+            poly = [[x, y] for x, y in zip(px, py)]
+            cv2.fillPoly(whole_mask, [np.array(poly)], (255, 255, 255))
+
+    if diffusion_type == 'Stable Diffusion':
+        pipe = StableDiffusionInpaintPipeline.from_pretrained(
+            'stabilityai/stable-diffusion-2-inpainting',
+            torch_dtype=torch.float16)
+        pipe = pipe.to('cuda')
+        img = img.resize((512, 512))
+        mask_img = numpy2PIL(numpy_image=whole_mask).convert("RGB").resize(
+            (512, 512))
+        prompt = "Just a background with no content"
+        result_img = pipe(
+            prompt=prompt, image=img, mask_image=mask_img).images[0]
+        result_img = result_img.resize(ori_img_size)
+
+    elif diffusion_type == 'Latent Diffusion':
+        config = OmegaConf.load(
+            "latent_diffusion/models/ldm/inpainting_big/config.yaml")
+        model = instantiate_from_config(config.model)
+        model.load_state_dict(
+            torch.load("latent_diffusion/checkpoints/last.ckpt")["state_dict"],
+            strict=False)
+        model = model.to('cuda')
+        mask_img = numpy2PIL(numpy_image=whole_mask)
+        result_img = erase_text_from_image(
+            img_path=img,
+            mask_pil_img=mask_img,
+            model=model,
+            device='cuda',
+            img_size=(512, 512),
+            steps=50)
+
+    result_img = cv2.cvtColor(np.array(result_img), cv2.COLOR_RGB2BGR)
+    return result_img
 
 
 if __name__ == '__main__':
@@ -152,9 +212,22 @@ if __name__ == '__main__':
                 sam_results = gr.Textbox(label='Detection Results')
                 mask_results = gr.Textbox(label='Mask Results', max_lines=2)
                 mmocr_sam = gr.Button('Run MMOCR and SAM')
-                text_index = gr.Textbox(label='Select Text Index')
-                prompt = gr.Textbox(label='Inpainting Prompt')
-                downstream = gr.Button('Run Inpainting')
+                text_index = gr.Textbox(
+                    label=
+                    'Select Text Index. It can be multiple indices separated by commas.'
+                )
+                diffusion_type = gr.Radio(
+                    choices=['Stable Diffusion', 'Latent Diffusion'],
+                    label='Erasing Model')
+                mask_type = gr.Radio(
+                    choices=['SAM', 'MMOCR'], label='Mask Type')
+                dilate_iter = gr.Slider(
+                    0,
+                    5,
+                    value=1,
+                    label='The dilate iteration to dilate the SAM ouput mask',
+                )
+                downstream = gr.Button('Run Erasing')
             with gr.Column(scale=1):
                 output_image = gr.Image(label='Output Image')
                 gr.Markdown("## Image Examples")
@@ -170,8 +243,11 @@ if __name__ == '__main__':
                 inputs=[input_image],
                 outputs=[output_image, sam_results, mask_results])
             downstream.click(
-                fn=run_downstream,
-                inputs=[input_image, mask_results, text_index, prompt],
+                fn=run_erase,
+                inputs=[
+                    input_image, mask_results, text_index, diffusion_type,
+                    mask_type, dilate_iter
+                ],
                 outputs=[output_image])
 
     demo.launch(debug=True)
