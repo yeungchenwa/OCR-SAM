@@ -3,24 +3,24 @@
 # OCR-SAM
 
 ## 🐇 Introduction 🐙
-This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment Anything](https://github.com/facebookresearch/segment-anything) and other Adavanced Tech to develop some **OCR-related Application Demo**. And we provide the **[WebUI by gradio](#run-webui)** and **Colab** to make user to have better interaction.  
+This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment Anything](https://github.com/facebookresearch/segment-anything) and other Adavanced Tech to develop some **OCR-related Application Demo**. And we provide the **[WebUI by gradio](#📺-run-webui-📱)** and **Colab** to make user to have better interaction.  
 
 *Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
 ## 📅 Updates 👀
 - **2023.04.12**: Repository Release
-- **2023.04.12**: Supported the [Inpainting](#inpainting-🥸) combined with DBNet++, SAM and ControlNet.
-- **2023.04.11**: Supported the [Erasing](#erasing-🤓) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
-- **2023.04.10**: Supported the [SAM for text](#sam-for-text-🧐) combined tieh DBNet++ and SAM.
+- **2023.04.12**: Supported the [Inpainting](#inpainting🥸) combined with DBNet++, SAM and ControlNet.
+- **2023.04.11**: Supported the [Erasing](#erasing🤓) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
+- **2023.04.10**: Supported the [SAM for text](#sam-for-text🧐) combined tieh DBNet++ and SAM.
 
 ## 📸 Demo Zoo 🔥
 
 This project includes:
-- [x] [SAM for Text](#sam-for-text-🧐): DBNet++ + SAM
+- [x] [SAM for Text](#sam-for-text🧐): DBNet++ + SAM
 ![](imgs/sam_vis.png)
-- [x] [Erasing](#erasing-🤓): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
+- [x] [Erasing](#erasing🤓): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
 ![](imgs/erase_vis.png)
-- [x] [Inpainting](#inpainting-🥸): DBNet++ + SAM + Stable Diffusion
+- [x] [Inpainting](#inpainting🥸): DBNet++ + SAM + Stable Diffusion
 ![](imgs/inpainting_vis.png)
 
 
