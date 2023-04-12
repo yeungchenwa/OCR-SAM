@@ -1,9 +1,9 @@
 ![](imgs/logo.png)
 
-# OCR-SAM
+# Optical Character Recognition with Segment Anything (OCR-SAM)
 
 ## 🐇 Introduction 🐙
-This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment Anything](https://github.com/facebookresearch/segment-anything) and other Adavanced Tech to develop some **OCR-related Application Demo**. And we provide the **[WebUI by gradio](#📺-run-webui-📱)** and **Colab** to make user to have better interaction.  
+Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OCR? We take a simple try to combine twp off-the-shelf OCR models in [MMOCR](https://github.com/open-mmlab/mmocr) with SAM to develop some OCR-related application demos, including **[SAM for Text](#sam-for-text)**, **[Text Removal](#erasing)** and **[Text Inpainting](#inpainting)**. And we also provide a **[WebUI by gradio](#run-webui)** to give a better interaction.  
 
 *Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
@@ -128,7 +128,7 @@ python mmocr_sam_erase.py \
 
 **Note: The first time you run may cost some time, becasuse downloading the stable-diffusion ckpt cost a lot, wait patiently👀**
 
-### **Inpainting**🥸
+### **Inpainting**
 More implementation **details** are listed [here](docs/inpainting_details.md)
 
 Run the following script:
@@ -146,7 +146,7 @@ python mmocr_sam_inpainting.py \
 - `--prompt`: the text prompt.
 - `--select_index`: select the index of the text to inpaint.
 
-### 📺 **Run WebUI** 📱
+### **Run WebUI**
 This repo also provides the WebUI(decided by gradio), inculding the Erasing and Inpainting.  
 
 Before running the script, you should install the gradio package:
@@ -154,7 +154,7 @@ Before running the script, you should install the gradio package:
 pip install gradio
 ```
 
-#### Erasing🤓
+#### Erasing
 ```
 python mmocr_sam_erase_app.py
 ```
