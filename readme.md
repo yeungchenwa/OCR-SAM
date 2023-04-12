@@ -1,4 +1,4 @@
-![]()
+![](imgs/logo.png)
 
 # OCR-SAM
 
@@ -20,7 +20,8 @@ This project includes:
 ![](imgs/sam_vis.png)
 - [x] [Erasing](#erasing-🤓): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
 ![](imgs/erase_vis.png)
-- [x] [Inpainting](#inpainting-🥸)
+- [x] [Inpainting](#inpainting-🥸): DBNet++ + SAM + Stable Diffusion
+![](imgs/inpainting_vis.png)
 
 
 ## 🚧 Installation 🛠️
@@ -70,6 +71,7 @@ conda install pytorch-lightning -c conda-forge
 Download the checkpints to the related path (If you've done, ignore the following):
 ```
 # mmocr ckpt
+mkdir mmocr_dev/checkpoints segment-anything-main/checkpoints latent_diffusion/checkpoints
 wget -O mmocr_dev/checkpoints/db_swin_mix_pretrain.pth 
 wget -O mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
 
@@ -82,7 +84,7 @@ wget -O latent_diffusion/checkpoints/last.ckpt https://heibox.uni-heidelberg.de/
 
 ## 🏃🏻‍♂️ Run Demo 🏊‍♂️
 
-### **SAM for Text** 🧐
+### **SAM for Text**🧐
 
 Run the following script:
 ```
@@ -95,7 +97,7 @@ python mmocr_sam.py \
 - `--outdir`: the dir to your output. 
 - `--device`: the device used for inference. 
 
-### **Erasing** 🤓
+### **Erasing**🤓
 
 In this application demo, we use the [latent-diffusion-inpainting](https://github.com/CompVis/latent-diffusion#inpainting) to erase, or the [Stable-Diffusion-inpainting](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/inpaint) with text prompt to erase, which you can choose one of both by the parameter `--diffusion_model`. Also, you can choose whether to use the SAM ouput mask to erase by the parameter `--use_sam`. More implementation **details** are listed [here](docs/erase_details.md)
 
@@ -126,30 +128,56 @@ python mmocr_sam_erase.py \
 
 **Note: The first time you run may cost some time, becasuse downloading the stable-diffusion ckpt cost a lot, wait patiently👀**
 
-### **Inpainting** 🥸
+### **Inpainting**🥸
 More implementation **details** are listed [here](docs/inpainting_details.md)
 
 Run the following script:
 ```
 python mmocr_sam_inpainting.py \
-    --inputs /YOUR/INPUT/IMG_PATH \ 
+    --img_path /YOUR/INPUT/IMG_PATH \ 
     --outdir /YOUR/OUTPUT_DIR \ 
     --device cuda \ 
+    --prompt YOUR_PROMPT \ 
+    --select_index 0 \ 
 ```
-- `--inputs`: 
-- `--outdir`: 
-- `--device`: 
+- `--img_path`: the path to your input image. 
+- `--outdir`: the dir to your output. 
+- `--device`: the device used for inference. 
+- `--prompt`: the text prompt.
+- `--select_index`: select the index of the text to inpaint.
 
 ### 📺 **Run WebUI** 📱
-This repo also provides the WebUI(decided by gradio), running the following:
-```
-python mmocr_sam_inpainting_app.py
-```
-Before running the above, you should install the gradio package:
+This repo also provides the WebUI(decided by gradio), inculding the Erasing and Inpainting.  
+
+Before running the script, you should install the gradio package:
 ```
 pip install gradio
 ```
-**Note: Before you open the web, it may cost some time, wait patiently👀**
+
+#### Erasing🤓
+```
+python mmocr_sam_erase_app.py
+```
+- **Example**:  
+
+**Detector and Recognizer WebUI Result**
+![](imgs/webui_detect_vis.png) 
+
+**Erasing WebUI Result**
+![](imgs/webui_erase_visit.png)  
+
+In our WebUI, user can interactly choose the SAM output and the diffusion model. Especially, user can choose which text to be erased.
+
+#### Inpainting🥸
+```
+python mmocr_sam_inpainting_app.py
+```
+- Example:  
+
+**Inpainting WebUI Result**
+![](imgs/webui_inpainting_vis.png)
+
+**Note: Before you open the web, it may cost some time, wait patiently👀** 
 
 ## 💗 Acknowledgement
 - [segment-anything](https://github.com/facebookresearch/segment-anything)
