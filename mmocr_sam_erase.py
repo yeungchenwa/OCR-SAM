@@ -104,6 +104,13 @@ def parse_args():
         help='If use stable-diffusion for erasing, you can set the local '
         'ckpt file. If want to download from hub, set `None`')
     parser.add_argument(
+        "--prompt",
+        type=str,
+        default=None,
+        help='If use stable-diffusion for erasing, you can set prompt '
+        'by yourself. If you want the default(`No text, clean background`), '
+        'set `None`')
+    parser.add_argument(
         "--img_size",
         type=tuple,
         default=(512, 512),
@@ -275,7 +282,10 @@ if __name__ == '__main__':
 
             # Stable Diffusion for Erasing
             start = time.time()
-            prompt = "Just a background with no content"
+            if args.prompt is not None:
+                prompt = args.prompt
+            else:
+                prompt = 'No text, clean background'
             image = pipe(
                 prompt=prompt, image=sd_img, mask_image=sd_mask_img).images[0]
             end = time.time()
