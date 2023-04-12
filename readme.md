@@ -9,17 +9,18 @@ This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment
 
 ## 📅 Updates 👀
 - **2023.04.12**: Repository Release
-- **2023.04.12**: Supported the [Inpainting](#🏃🏻‍♂️-run-demo-🏊‍♂️) combined with DBNet++, SAM and ControlNet.
-- **2023.04.11**: Supported the [Erasing](#🏃🏻‍♂️-run-demo-🏊‍♂️) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
+- **2023.04.12**: Supported the [Inpainting](#inpainting-🥸) combined with DBNet++, SAM and ControlNet.
+- **2023.04.11**: Supported the [Erasing](#erasing-🤓) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
+- **2023.04.10**: Supported the [SAM for text](#sam-for-text-🧐) combined tieh DBNet++ and SAM.
 
 ## 📸 Demo Zoo 🔥
 
 This project includes:
-- [x] [SAM for Text](#🏃🏻‍♂️-run-demo-🏊‍♂️): DBNet++ + SAM
+- [x] [SAM for Text](#sam-for-text-🧐): DBNet++ + SAM
 ![](imgs/sam_vis.png)
-- [x] [Erasing](#🏃🏻‍♂️-run-demo-🏊‍♂️): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
+- [x] [Erasing](#erasing-🤓): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
 ![](imgs/erase_vis.png)
-- [x] [Inpainting](#🏃🏻‍♂️-run-demo-🏊‍♂️)
+- [x] [Inpainting](#inpainting-🥸)
 
 
 ## 🚧 Installation 🛠️
@@ -51,7 +52,7 @@ mim install 'mmdet==3.0.0rc5'
 mim install 'mmcls==1.0.0rc5'
 
 # Install the mmocr from source
-cd OCR-SAM
+cd OCR-SAM/mmocr_dev
 pip install -v -e .
 ```
 
@@ -64,7 +65,7 @@ pip install diffusers
 conda install pytorch-lightning -c conda-forge
 ```
 
-## Model checkpoints
+## 📒 Model checkpoints 🖥
 
 Download the checkpints to the related path (If you've done, ignore the following):
 ```
@@ -96,7 +97,7 @@ python mmocr_sam.py \
 
 ### **Erasing** 🤓
 
-More implementation **details** are listed [here](docs/erase_details.md)
+In this application demo, we use the [latent-diffusion-inpainting](https://github.com/CompVis/latent-diffusion#inpainting) to erase, or the [Stable-Diffusion-inpainting](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/inpaint) with text prompt to erase, which you can choose one of both by the parameter `--diffusion_model`. Also, you can choose whether to use the SAM ouput mask to erase by the parameter `--use_sam`. More implementation **details** are listed [here](docs/erase_details.md)
 
 Run the following script:
 ```
@@ -108,6 +109,7 @@ python mmocr_sam_erase.py \
     --dilate_iteration 2 \ 
     --diffusion_model \ 
     --sd_ckpt None \ 
+    --prompt None \ 
     --img_size (512, 512) \ 
 ```
 - `--inputs `: the path to your input image.
@@ -117,8 +119,12 @@ python mmocr_sam_erase.py \
 - `--dilate_iteration`: iter to dilate the SAM's mask.
 - `--diffusion_model`: choose 'latent-diffusion' or 'stable-diffusion'.
 - `--sd_ckpt`: path to the checkpoints of stable-diffusion.
-- `--img_size`: image size of latent-diffusion.
+- `--prompt`: the text prompt when use the stable-diffusion, set 'None' if use the default for erasing.
+- `--img_size`: image size of latent-diffusion.  
 
+**Run the WebUI**: see [here](#📺-run-webui-📱)
+
+**Note: The first time you run may cost some time, becasuse downloading the stable-diffusion ckpt cost a lot, wait patiently👀**
 
 ### **Inpainting** 🥸
 More implementation **details** are listed [here](docs/inpainting_details.md)
@@ -134,11 +140,16 @@ python mmocr_sam_inpainting.py \
 - `--outdir`: 
 - `--device`: 
 
-### **Run WebUI**
+### 📺 **Run WebUI** 📱
 This repo also provides the WebUI(decided by gradio), running the following:
 ```
-python mmocr_sam_inpainting_aoo.py
+python mmocr_sam_inpainting_app.py
 ```
+Before running the above, you should install the gradio package:
+```
+pip install gradio
+```
+**Note: Before you open the web, it may cost some time, wait patiently👀**
 
 ## 💗 Acknowledgement
 - [segment-anything](https://github.com/facebookresearch/segment-anything)
