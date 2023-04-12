@@ -3,23 +3,23 @@
 # OCR-SAM
 
 ## 🐇 Introduction 🐙
-This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment Anything](https://github.com/facebookresearch/segment-anything) and other Adavanced Tech to develop some **OCR-related Application Demo**. And we provide the **WebUI by gradio** and **Colab** to make user to have better interaction.  
+This repository is mainly to combine the TextDetector, TextRecgonizer，[Segment Anything](https://github.com/facebookresearch/segment-anything) and other Adavanced Tech to develop some **OCR-related Application Demo**. And we provide the **[WebUI by gradio](#run-webui)** and **Colab** to make user to have better interaction.  
 
 *Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
 ## 📅 Updates 👀
 - **2023.04.12**: Repository Release
-- **2023.04.12**: Supported the [Inpainting](#🏃🏻‍♂️-Run-Demo#Inpainting) combined with DBNet++, SAM and ControlNet.
-- **2023.04.11**: Supported the [Erasing](#🏃🏻‍♂️-Run-Demo#Erasing) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
+- **2023.04.12**: Supported the [Inpainting](#🏃🏻‍♂️-run-demo-🏊‍♂️) combined with DBNet++, SAM and ControlNet.
+- **2023.04.11**: Supported the [Erasing](#🏃🏻‍♂️-run-demo-🏊‍♂️) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
 
 ## 📸 Demo Zoo 🔥
 
 This project includes:
-- [x] [SAM_for Text](#🏃🏻‍♂️-Run-Demo#SAM-for-Text)
-
-- [x] [Erasing](#🏃🏻‍♂️-Run-Demo#Erasing): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
-![](./imgs/erase_vis.png)
-- [x] [Inpainting](#🏃🏻‍♂️-Run-Demo#Inpainting)
+- [x] [SAM for Text](#🏃🏻‍♂️-run-demo-🏊‍♂️): DBNet++ + SAM
+![](imgs/sam_vis.png)
+- [x] [Erasing](#🏃🏻‍♂️-run-demo-🏊‍♂️): DBNet++ + SAM + Latent-Diffusion / Stable Diffusion 
+![](imgs/erase_vis.png)
+- [x] [Inpainting](#🏃🏻‍♂️-run-demo-🏊‍♂️)
 
 
 ## 🚧 Installation 🛠️
@@ -64,44 +64,81 @@ pip install diffusers
 conda install pytorch-lightning -c conda-forge
 ```
 
+## Model checkpoints
+
+Download the checkpints to the related path (If you've done, ignore the following):
+```
+# mmocr ckpt
+wget -O mmocr_dev/checkpoints/db_swin_mix_pretrain.pth 
+wget -O mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
+
+# sam ckpt, more details: https://github.com/facebookresearch/segment-anything#model-checkpoints
+wget -O segment-anything-main/checkpoints/sam_vit_h_4b8939.pth https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
+
+# ldm ckpt
+wget -O latent_diffusion/checkpoints/last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1
+```
 
 ## 🏃🏻‍♂️ Run Demo 🏊‍♂️
 
-### **SAM for Text**
+### **SAM for Text** 🧐
 
-### **Erasing**
-
-##### **Framework**  
-![]()
-
-More implementation details are listed [here](docs/erase_details.md)
-
-##### **Run Script** 
-
-**Step 0**: Download the checkpints to the related path (If you've done, ignore the following):
+Run the following script:
 ```
-
+python mmocr_sam.py \
+    --inputs /YOUR/INPUT/IMG_PATH \ 
+    --outdir /YOUR/OUTPUT_DIR \ 
+    --device cuda \ 
 ```
+- `--inputs`: the path to your input image. 
+- `--outdir`: the dir to your output. 
+- `--device`: the device used for inference. 
 
-**Step 1**: Run the following script:
+### **Erasing** 🤓
+
+More implementation **details** are listed [here](docs/erase_details.md)
+
+Run the following script:
 ```
 python mmocr_sam_erase.py \ 
-        --inputs /YOUR/INPUT/IMG_PATH \ 
-        --outdir /YOUR/OUTPUT_DIR \ 
-        --device cuda \ 
-        --use_sam True \ 
-        --dilate_iteration 2 \ 
-        --diffusion_model \ 
-        --sd_ckpt None \ 
-        --img_size (512, 512) \ 
+    --inputs /YOUR/INPUT/IMG_PATH \ 
+    --outdir /YOUR/OUTPUT_DIR \ 
+    --device cuda \ 
+    --use_sam True \ 
+    --dilate_iteration 2 \ 
+    --diffusion_model \ 
+    --sd_ckpt None \ 
+    --img_size (512, 512) \ 
 ```
-* `--inputs ` is the path to your input image.
-* `--outdir` is the dir to your output.  
+- `--inputs `: the path to your input image.
+- `--outdir`: the dir to your output. 
+- `--device`: the device used for inference. 
+- `--use_sam`: whether to use sam for segment.
+- `--dilate_iteration`: iter to dilate the SAM's mask.
+- `--diffusion_model`: choose 'latent-diffusion' or 'stable-diffusion'.
+- `--sd_ckpt`: path to the checkpoints of stable-diffusion.
+- `--img_size`: image size of latent-diffusion.
 
-##### **Run WebUI**
 
-### **Inpainting**
+### **Inpainting** 🥸
+More implementation **details** are listed [here](docs/inpainting_details.md)
 
+Run the following script:
+```
+python mmocr_sam_inpainting.py \
+    --inputs /YOUR/INPUT/IMG_PATH \ 
+    --outdir /YOUR/OUTPUT_DIR \ 
+    --device cuda \ 
+```
+- `--inputs`: 
+- `--outdir`: 
+- `--device`: 
+
+### **Run WebUI**
+This repo also provides the WebUI(decided by gradio), running the following:
+```
+python mmocr_sam_inpainting_aoo.py
+```
 
 ## 💗 Acknowledgement
 - [segment-anything](https://github.com/facebookresearch/segment-anything)
