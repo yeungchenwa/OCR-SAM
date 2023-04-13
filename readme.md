@@ -68,11 +68,12 @@ conda install pytorch-lightning -c conda-forge
 
 ## 📒 Model checkpoints 🖥
 
-Download the checkpints to the related path (If you've done, ignore the following):
+First the SceneTextDetector is trained by a lot of scene text datasets, the effects are generic and not limited to one dataset (e.g. ICDAR2015). **Checkpoint download link is [here](https://drive.google.com/file/d/1r3B1xhkyKYcQ9SR7o9hw9zhNJinRiHD-/view?usp=share_link), and you should put it to the path `mmocr_dev/checkpoints`**.
+
+Download the rest of checkpints to the related path (If you've done, ignore the following):
 ```
 # mmocr ckpt
-mkdir mmocr_dev/checkpoints segment-anything-main/checkpoints latent_diffusion/checkpoints
-wget -O mmocr_dev/checkpoints/db_swin_mix_pretrain.pth 
+mkdir mmocr_dev/checkpoints segment-anything-main/checkpoints latent_diffusion/checkpoints 
 wget -O mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
 
 # sam ckpt, more details: https://github.com/facebookresearch/segment-anything#model-checkpoints
