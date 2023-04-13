@@ -82,6 +82,10 @@ We retrain DBNet++ with Swin Transformer V2 as the backbone on a combination of 
 
 And you should make dir following:  
 ```bash
+mkdir checkpoints
+mkdir checkpoints/mmocr
+mkdir checkpoints/sam
+mkdir checkpoints/ldm
 mv db_swin_mix_pretrain.pth checkpoints/mmocr
 ```
 
