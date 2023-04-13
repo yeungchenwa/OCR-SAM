@@ -3,7 +3,7 @@
 # Optical Character Recognition with Segment Anything (OCR-SAM)
 
 ## 🐇 Introduction 🐙
-Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OCR? We take a simple try to combine twp off-the-shelf OCR models in [MMOCR](https://github.com/open-mmlab/mmocr) with SAM to develop some OCR-related application demos, including **[SAM for Text](#sam-for-text)**, **[Text Removal](#erasing)** and **[Text Inpainting](#inpainting)**. And we also provide a **[WebUI by gradio](#run-webui)** to give a better interaction.  
+Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OCR? We take a simple try to combine two off-the-shelf OCR models in [MMOCR](https://github.com/open-mmlab/mmocr) with SAM to develop some OCR-related application demos, including **[SAM for Text](#sam-for-text)**, **[Text Removal](#erasing)** and **[Text Inpainting](#inpainting)**. And we also provide a **[WebUI by gradio](#run-webui)** to give a better interaction.  
 
 *Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
@@ -68,12 +68,19 @@ conda install pytorch-lightning -c conda-forge
 
 ## 📒 Model checkpoints 🖥
 
-First the SceneTextDetector is trained by a lot of scene text datasets, the effects are generic and not limited to one dataset (e.g. ICDAR2015). **Checkpoint download link is [here](https://drive.google.com/file/d/1r3B1xhkyKYcQ9SR7o9hw9zhNJinRiHD-/view?usp=share_link), and you should put it to the path `mmocr_dev/checkpoints`**.
+The SceneTextDetector is trained by a lot of scene text datasets, the effects are generic and not limited to one dataset (e.g. ICDAR2015). **Checkpoint download link is [here](https://drive.google.com/file/d/1r3B1xhkyKYcQ9SR7o9hw9zhNJinRiHD-/view?usp=share_link)**.  
+
+And you should make dir following:  
+```
+mkdir mmocr_dev/checkpoints 
+```
+Then put the ckpt to the path `mmocr_dev/checkpoints`.
 
 Download the rest of checkpints to the related path (If you've done, ignore the following):
 ```
-# mmocr ckpt
-mkdir mmocr_dev/checkpoints segment-anything-main/checkpoints latent_diffusion/checkpoints 
+mkdir segment-anything-main/checkpoints latent_diffusion/checkpoints
+
+# mmocr recognizer ckpt
 wget -O mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
 
 # sam ckpt, more details: https://github.com/facebookresearch/segment-anything#model-checkpoints
