@@ -195,7 +195,7 @@ if __name__ == '__main__':
         pipe = pipe.to(args.device)
     else:
         config = OmegaConf.load(
-            "latent_diffusion/models/ldm/inpainting_big/config.yaml")
+            "latent_diffusion/inpainting_big/config.yaml")
         model = instantiate_from_config(config.model)
         model.load_state_dict(
             torch.load("checkpoints/ldm/last.ckpt")["state_dict"],
