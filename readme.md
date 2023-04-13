@@ -34,50 +34,63 @@ This project includes:
 
 ### Environment Setup
 Clone this repo:
-```
+```bash
 git clone https://github.com/yeungchenwa/OCR-SAM.git
 ```
 **Step 0**: Create a conda environment and activate it.
-```
+```bash
 conda create --n ocr-sam python=3.8 -y
 conda activate ocr-sam
 ```
 **Step 1**: Install related version Pytorch following [here](https://pytorch.org/get-started/previous-versions/).
-
-**Step 2**: Install the mmengine, mmcv, mmdet, mmcls, mmocr.
+```bash
+# Suggested
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
 ```
+**Step 2**: Install the mmengine, mmcv, mmdet, mmcls, mmocr.
+```bash
 pip install -U openmim
 mim install mmengine
 mim install 'mmcv==2.0.0rc4'
 mim install 'mmdet==3.0.0rc5'
 mim install 'mmcls==1.0.0rc5'
 
-# Install the mmocr from source
+# Install mmocr from source
 cd OCR-SAM/mmocr_dev
 pip install -v -e .
+
+# Install sam from source
+cd OCR-SAM/segment-anything-main
+pip install -v .
+
+# Install required packages
+pip install -r requirements.txt
 ```
 
 **Step 3**: Prepare for the diffusers and latent-diffusion.
-```
+```bash
+# Install Gradio
+pip install gradio
+
 # Install the diffusers
 pip install diffusers
 
 # Install the pytorch_lightning for ldm
-conda install pytorch-lightning -c conda-forge
+pip install pytorch-lightning==2.0.1.post0
 ```
 
 ## 📒 Model checkpoints 🖥
 
-The SceneTextDetector is trained by a lot of scene text datasets, the effects are generic and not limited to one dataset (e.g. ICDAR2015). **Checkpoint download link is [here](https://drive.google.com/file/d/1r3B1xhkyKYcQ9SR7o9hw9zhNJinRiHD-/view?usp=share_link)**.  
+We retrain DBNet++ with Swin Transformer V2 as the backbone on a combination of multiple scene text datsets (e.g. HierText, TextOCR). **Checkpoint for DBNet++ on [Google Drive (1G)](https://drive.google.com/file/d/1r3B1xhkyKYcQ9SR7o9hw9zhNJinRiHD-/view?usp=share_link)**.  
 
 And you should make dir following:  
-```
+```bash
 mkdir mmocr_dev/checkpoints 
+mv db_swin_mix_pretrain.pth mmocr_dev/checkpoints
 ```
-Then put the ckpt to the path `mmocr_dev/checkpoints`.
 
 Download the rest of checkpints to the related path (If you've done, ignore the following):
-```
+```bash
 mkdir segment-anything-main/checkpoints latent_diffusion/checkpoints
 
 # mmocr recognizer ckpt
@@ -95,7 +108,7 @@ wget -O latent_diffusion/checkpoints/last.ckpt https://heibox.uni-heidelberg.de/
 ### **SAM for Text**🧐
 
 Run the following script:
-```
+```bash
 python mmocr_sam.py \
     --inputs /YOUR/INPUT/IMG_PATH \ 
     --outdir /YOUR/OUTPUT_DIR \ 
@@ -110,7 +123,7 @@ python mmocr_sam.py \
 In this application demo, we use the [latent-diffusion-inpainting](https://github.com/CompVis/latent-diffusion#inpainting) to erase, or the [Stable-Diffusion-inpainting](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/inpaint) with text prompt to erase, which you can choose one of both by the parameter `--diffusion_model`. Also, you can choose whether to use the SAM ouput mask to erase by the parameter `--use_sam`. More implementation **details** are listed [here](docs/erase_details.md)
 
 Run the following script:
-```
+```bash
 python mmocr_sam_erase.py \ 
     --inputs /YOUR/INPUT/IMG_PATH \ 
     --outdir /YOUR/OUTPUT_DIR \ 
@@ -140,7 +153,7 @@ python mmocr_sam_erase.py \
 More implementation **details** are listed [here](docs/inpainting_details.md)
 
 Run the following script:
-```
+```bash
 python mmocr_sam_inpainting.py \
     --img_path /YOUR/INPUT/IMG_PATH \ 
     --outdir /YOUR/OUTPUT_DIR \ 
@@ -158,12 +171,12 @@ python mmocr_sam_inpainting.py \
 This repo also provides the WebUI(decided by gradio), inculding the Erasing and Inpainting.  
 
 Before running the script, you should install the gradio package:
-```
+```bash
 pip install gradio
 ```
 
 #### Erasing
-```
+```bash
 python mmocr_sam_erase_app.py
 ```
 - **Example**:  
@@ -177,7 +190,7 @@ python mmocr_sam_erase_app.py
 In our WebUI, user can interactly choose the SAM output and the diffusion model. Especially, user can choose which text to be erased.
 
 #### Inpainting🥸
-```
+```bash
 python mmocr_sam_inpainting_app.py
 ```
 - Example:  
