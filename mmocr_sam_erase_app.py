@@ -184,7 +184,7 @@ def run_erase(img: np.ndarray, mask_results, indexs: str, diffusion_type: str,
 
     elif diffusion_type == 'Latent Diffusion':
         config = OmegaConf.load(
-            "latent_diffusion/models/ldm/inpainting_big/config.yaml")
+            "latent_diffusion/inpainting_big/config.yaml")
         model = instantiate_from_config(config.model)
         model.load_state_dict(
             torch.load("checkpoints/ldm/last.ckpt")["state_dict"],
