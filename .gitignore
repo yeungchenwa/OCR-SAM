@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb
+*.pth
+*.ckpt
+results/
+flagged/
+output.png
+test_out.png
+.vscode/
