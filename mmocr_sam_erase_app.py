@@ -18,10 +18,10 @@ sys.path.append('latent_diffusion')
 from latent_diffusion.ldm_erase_text import erase_text_from_image, instantiate_from_config, OmegaConf
 
 det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
-det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
+det_weight = 'checkpoints/mmocr/db_swin_mix_pretrain.pth'
 rec_config = 'mmocr_dev/configs/textrecog/abinet/abinet_20e_st-an_mj.py'
-rec_weight = 'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
-sam_checkpoint = 'segment-anything-main/checkpoints/sam_vit_h_4b8939.pth'
+rec_weight = 'checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
+sam_checkpoint = 'checkpoints/sam/sam_vit_h_4b8939.pth'
 device = 'cuda'
 sam_type = 'vit_h'
 
@@ -187,7 +187,7 @@ def run_erase(img: np.ndarray, mask_results, indexs: str, diffusion_type: str,
             "latent_diffusion/models/ldm/inpainting_big/config.yaml")
         model = instantiate_from_config(config.model)
         model.load_state_dict(
-            torch.load("latent_diffusion/checkpoints/last.ckpt")["state_dict"],
+            torch.load("checkpoints/ldm/last.ckpt")["state_dict"],
             strict=False)
         model = model.to('cuda')
         mask_img = numpy2PIL(numpy_image=whole_mask)

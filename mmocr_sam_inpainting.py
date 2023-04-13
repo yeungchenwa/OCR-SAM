@@ -31,7 +31,7 @@ def parse_args():
         '--det-weights',
         type=str,
         # required=True,
-        default='mmocr_dev/checkpoints/db_swin_mix_pretrain.pth',
+        default='checkpoints/mmocr/db_swin_mix_pretrain.pth',
         help='Path to the custom checkpoint file of the selected det model.')
     parser.add_argument(
         '--rec',
@@ -42,9 +42,8 @@ def parse_args():
     parser.add_argument(
         '--rec-weights',
         type=str,
-        # required=True,
         default=
-        'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth',  # noqa
+        'checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth',  # noqa
         help='Path to the custom checkpoint file of the selected recog model.')
     parser.add_argument(
         '--device',
@@ -56,8 +55,8 @@ def parse_args():
     parser.add_argument(
         "--sam_checkpoint",
         type=str,
-        # required=True,
-        default='segment-anything-main/checkpoints/sam_vit_h_4b8939.pth',
+        required=True,
+        default='checkpoints/sam/sam_vit_h_4b8939.pth',
         help="path to checkpoint file")
     parser.add_argument(
         "--sam_type",
