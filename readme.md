@@ -25,11 +25,11 @@ This project includes:
 
 
 ## 🚧 Installation 🛠️
-### Prerequisites
+### Prerequisites(Recommended)
 
 - Linux | Windows
-- Python 3.7
-- Pytorch 1.6 or higher
+- Python 3.8
+- Pytorch 1.12
 - CUDA 11.3
 
 ### Environment Setup
@@ -37,21 +37,24 @@ Clone this repo:
 ```bash
 git clone https://github.com/yeungchenwa/OCR-SAM.git
 ```
-**Step 0**: Create a conda environment and activate it.
+**Step 0**: Download and install Miniconda from the [official website](https://docs.conda.io/en/latest/miniconda.html).  
+
+**Step 1**: Create a conda environment and activate it.
 ```bash
-conda create --n ocr-sam python=3.8 -y
+conda create -n ocr-sam python=3.8 -y
 conda activate ocr-sam
 ```
-**Step 1**: Install related version Pytorch following [here](https://pytorch.org/get-started/previous-versions/).
+**Step 2**: Install related version Pytorch following [here](https://pytorch.org/get-started/previous-versions/).
 ```bash
 # Suggested
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
 ```
-**Step 2**: Install the mmengine, mmcv, mmdet, mmcls, mmocr.
+**Step 3**: Install the mmengine, mmcv, mmdet, mmcls, mmocr.
 ```bash
 pip install -U openmim
 mim install mmengine
 mim install mmocr
+# In Window, the following symbol ' should be changed to "
 mim install 'mmcv==2.0.0rc4'
 mim install 'mmdet==3.0.0rc5'
 mim install 'mmcls==1.0.0rc5'
@@ -64,7 +67,7 @@ pip install git+https://github.com/facebookresearch/segment-anything.git
 pip install -r requirements.txt
 ```
 
-**Step 3**: Prepare for the diffusers and latent-diffusion.
+**Step 4**: Prepare for the diffusers and latent-diffusion.
 ```bash
 # Install Gradio
 pip install gradio
