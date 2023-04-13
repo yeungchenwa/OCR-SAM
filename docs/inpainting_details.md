@@ -1,3 +1,0 @@
-# Inpainting Details
-
-Coming Soon...
