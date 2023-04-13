@@ -9,3 +9,4 @@ checkpoints/
 output.png
 test_out.png
 .vscode/
+segment-anything-main/
