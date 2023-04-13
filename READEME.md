@@ -51,17 +51,14 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url http
 ```bash
 pip install -U openmim
 mim install mmengine
+mim install mmocr
 mim install 'mmcv==2.0.0rc4'
 mim install 'mmdet==3.0.0rc5'
 mim install 'mmcls==1.0.0rc5'
 
-# Install mmocr from source
-cd OCR-SAM/mmocr_dev
-pip install -v -e .
 
-# Install sam from source
-cd OCR-SAM/segment-anything-main
-pip install -v .
+# Install sam
+pip install git+https://github.com/facebookresearch/segment-anything.git
 
 # Install required packages
 pip install -r requirements.txt
@@ -85,22 +82,20 @@ We retrain DBNet++ with Swin Transformer V2 as the backbone on a combination of 
 
 And you should make dir following:  
 ```bash
-mkdir mmocr_dev/checkpoints 
-mv db_swin_mix_pretrain.pth mmocr_dev/checkpoints
+mv db_swin_mix_pretrain.pth checkpoints/mmocr
 ```
 
 Download the rest of checkpints to the related path (If you've done, ignore the following):
 ```bash
-mkdir segment-anything-main/checkpoints latent_diffusion/checkpoints
 
 # mmocr recognizer ckpt
-wget -O mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
+wget -O checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth
 
 # sam ckpt, more details: https://github.com/facebookresearch/segment-anything#model-checkpoints
-wget -O segment-anything-main/checkpoints/sam_vit_h_4b8939.pth https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
+wget -O checkpoints/sam/sam_vit_h_4b8939.pth https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
 
 # ldm ckpt
-wget -O latent_diffusion/checkpoints/last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1
+wget -O checkpoints/ldm/last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1
 ```
 
 ## 🏃🏻‍♂️ Run Demo 🏊‍♂️

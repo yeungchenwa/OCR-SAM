@@ -3,9 +3,9 @@ __pycache__/
 *$py.class
 *.ipynb
 *.pth
-*.ckpt
 results/
 flagged/
+checkpoints/
 output.png
 test_out.png
 .vscode/

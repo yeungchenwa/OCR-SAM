@@ -45,7 +45,7 @@ def parse_args():
         '--det-weights',
         type=str,
         # required=True,
-        default='mmocr_dev/checkpoints/db_swin_mix_pretrain.pth',
+        default='checkpoints/mmocr/db_swin_mix_pretrain.pth',
         help='Path to the custom checkpoint file of the selected det model.')
     parser.add_argument(
         '--rec',
@@ -57,7 +57,7 @@ def parse_args():
         '--rec-weights',
         type=str,
         default=
-        'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth',
+        'checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth',
         help='Path to the custom checkpoint file of the selected recog model.')
     parser.add_argument(
         '--device',
@@ -76,7 +76,7 @@ def parse_args():
     parser.add_argument(
         "--sam_checkpoint",
         type=str,
-        default='segment-anything-main/checkpoints/sam_vit_h_4b8939.pth',
+        default='checkpoints/sam/sam_vit_h_4b8939.pth',
         help="path to checkpoint file")
     parser.add_argument(
         "--sam_type",
@@ -198,7 +198,7 @@ if __name__ == '__main__':
             "latent_diffusion/models/ldm/inpainting_big/config.yaml")
         model = instantiate_from_config(config.model)
         model.load_state_dict(
-            torch.load("latent_diffusion/checkpoints/last.ckpt")["state_dict"],
+            torch.load("checkpoints/ldm/last.ckpt")["state_dict"],
             strict=False)
         model = model.to(args.device)
 

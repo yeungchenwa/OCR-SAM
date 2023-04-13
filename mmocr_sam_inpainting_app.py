@@ -14,10 +14,10 @@ from segment_anything import SamPredictor, sam_model_registry
 from diffusers import StableDiffusionInpaintPipeline
 
 det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
-det_weight = 'mmocr_dev/checkpoints/db_swin_mix_pretrain.pth'
+det_weight = 'checkpoints/mmocr/db_swin_mix_pretrain.pth'
 rec_config = 'mmocr_dev/configs/textrecog/abinet/abinet_20e_st-an_mj.py'
-rec_weight = 'mmocr_dev/checkpoints/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
-sam_checkpoint = 'segment-anything-main/checkpoints/sam_vit_h_4b8939.pth'
+rec_weight = 'checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
+sam_checkpoint = 'checkpoints/sam/sam_vit_h_4b8939.pth'
 device = 'cuda'
 sam_type = 'vit_h'
 
