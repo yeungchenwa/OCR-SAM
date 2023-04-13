@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument(
         '--inputs',
         type=str,
-        default='example_images/erase_1.jpg',
+        default='imgs/erase_1.jpg',
         help='Input image file or folder path.')
     parser.add_argument(
         '--outdir',

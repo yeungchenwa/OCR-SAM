@@ -160,14 +160,11 @@ if __name__ == '__main__':
                 gr.Markdown("## Image Examples")
                 gr.Examples(
                     examples=[
-                        'example_images/ex1.jpg', 'example_images/ex2.jpg',
-                        'example_images/ex3.jpg', 'example_images/ex4.jpg',
-                        'example_images/ex5.jpg', 'example_images/ex6.jpg',
-                        'example_images/ex7.jpg', 'example_images/ex8.jpg',
-                        'example_images/ex9.jpg', 'example_images/ex10.jpg',
-                        'example_images/ex11.jpg', 'example_images/ex12.jpg',
-                        'example_images/ex13.jpg', 'example_images/ex14.jpg',
-                        'example_images/ex15.jpg'
+                        'imgs/ex1.jpg', 'imgs/ex2.jpg', 'imgs/ex3.jpg',
+                        'imgs/ex4.jpg', 'imgs/ex5.jpg', 'imgs/ex6.jpg',
+                        'imgs/ex7.jpg', 'imgs/ex8.jpg', 'imgs/ex9.jpg',
+                        'imgs/ex10.jpg', 'imgs/ex11.jpg', 'imgs/ex12.jpg',
+                        'imgs/ex13.jpg', 'imgs/ex14.jpg', 'imgs/ex15.jpg'
                     ],
                     inputs=input_image,
                 )
