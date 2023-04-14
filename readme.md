@@ -8,10 +8,12 @@ Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OC
 *Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
 ## 📅 Updates 👀
+- **2023.04.14**: 📣 Our repository is migrated to **[open-mmlab/playground](https://github.com/open-mmlab/playground#-mmocr-sam)**.
 - **2023.04.12**: Repository Release
-- **2023.04.12**: Supported the [Inpainting](#inpainting🥸) combined with DBNet++, SAM and ControlNet.
-- **2023.04.11**: Supported the [Erasing](#erasing🤓) combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
-- **2023.04.10**: Supported the [SAM for text](#sam-for-text🧐) combined tieh DBNet++ and SAM.
+- **2023.04.12**: Supported the **[Inpainting](#inpainting🥸)** combined with DBNet++, SAM and ControlNet.
+- **2023.04.11**: Supported the **[Erasing](#erasing🤓)** combined with DBNet++, SAM and Latent-Diffusion / Stable-Diffusion.
+- **2023.04.10**: Supported the **[SAM for text](#sam-for-text🧐)** combined tieh DBNet++ and SAM.
+- **2023.04.09**: How effective is the SAM used on OCR Text Image, we've discussed it in the **[Blog](https://www.zhihu.com/question/593914819/answer/2976012032)**.
 
 ## 📸 Demo Zoo 🔥
 
