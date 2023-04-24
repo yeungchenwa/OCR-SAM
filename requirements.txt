@@ -1,3 +1,10 @@
+gradio
+numpy
+openmim
 omegaconf==2.3.0
 einops==0.6.0
 transformers==4.27.3
+pytorch-lightning==2.0.1.post0
+diffusers==0.14.0
+torch>=1.8
+torchvision>=1.12.1
