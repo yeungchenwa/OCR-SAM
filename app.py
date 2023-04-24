@@ -1,5 +1,6 @@
 import os
 
+os.system('pip install git+https://github.com/facebookresearch/segment-anything.git')
 os.system('python -m mim install mmocr')
 os.system('python -m mim install "mmcv>=2.0.0rc4"')
 os.system('python -m mim install mmengine')
