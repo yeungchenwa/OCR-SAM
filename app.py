@@ -1,5 +1,6 @@
 import os
 
+os.system('python -m mim install mmocr')
 os.system('python -m mim install "mmcv>=2.0.0rc4"')
 os.system('python -m mim install mmengine')
 os.system('python -m mim install "mmdet>=3.0.0rc5"')
