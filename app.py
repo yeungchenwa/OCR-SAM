@@ -1,3 +1,10 @@
+import os
+
+os.system('python -m mim install "mmcv>=2.0.0rc4"')
+os.system('python -m mim install mmengine')
+os.system('python -m mim install "mmdet>=3.0.0rc5"')
+os.system('python -m mim install "mmcls==1.0.0rc5"')
+
 import cv2
 import gradio as gr
 import numpy as np
