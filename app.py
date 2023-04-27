@@ -7,7 +7,7 @@ os.system('wget -O last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582
 
 os.system('pip install git+https://github.com/facebookresearch/segment-anything.git')
 os.system('python -m mim install mmocr')
-os.system('python -m mim install "mmcv>=2.0.0rc4"')
+os.system('python -m mim install "mmcv==2.0.0rc4"')
 os.system('python -m mim install mmengine')
 os.system('python -m mim install "mmdet>=3.0.0rc5"')
 os.system('python -m mim install "mmcls==1.0.0rc5"')
