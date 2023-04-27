@@ -1,9 +1,9 @@
 import os
 
-
+os.system('wget https://github.com/yeungchenwa/OCR-SAM/releases/download/ckpt/db_swin_mix_pretrain.pth')
 os.system('wget https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth')
 os.system('wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth')
-os.system('wget https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1')
+os.system('wget -O last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1')
 
 os.system('pip install git+https://github.com/facebookresearch/segment-anything.git')
 os.system('python -m mim install mmocr')
