@@ -1,5 +1,10 @@
 import os
 
+
+os.system('wget https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e_st-an_mj/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth')
+os.system('wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth')
+os.system('wget https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1')
+
 os.system('pip install git+https://github.com/facebookresearch/segment-anything.git')
 os.system('python -m mim install mmocr')
 os.system('python -m mim install "mmcv>=2.0.0rc4"')
@@ -27,10 +32,10 @@ sys.path.append('latent_diffusion')
 from latent_diffusion.ldm_erase_text import erase_text_from_image, instantiate_from_config, OmegaConf
 
 det_config = 'mmocr_dev/configs/textdet/dbnetpp/dbnetpp_swinv2_base_w16_in21k.py'  # noqa
-det_weight = 'checkpoints/mmocr/db_swin_mix_pretrain.pth'
+det_weight = 'db_swin_mix_pretrain.pth'
 rec_config = 'mmocr_dev/configs/textrecog/abinet/abinet_20e_st-an_mj.py'
-rec_weight = 'checkpoints/mmocr/abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
-sam_checkpoint = 'checkpoints/sam/sam_vit_h_4b8939.pth'
+rec_weight = 'abinet_20e_st-an_mj_20221005_012617-ead8c139.pth'
+sam_checkpoint = 'sam_vit_h_4b8939.pth'
 device = 'cuda'
 sam_type = 'vit_h'
 
