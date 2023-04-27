@@ -5,6 +5,7 @@ os.system('wget https://download.openmmlab.com/mmocr/textrecog/abinet/abinet_20e
 os.system('wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth')
 os.system('wget -O last.ckpt https://heibox.uni-heidelberg.de/f/4d9ac7ea40c64582b7c9/?dl=1')
 
+os.system('conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch')
 os.system('pip install git+https://github.com/facebookresearch/segment-anything.git')
 os.system('python -m mim install mmocr')
 os.system('python -m mim install "mmcv==2.0.0rc4"')
