@@ -5,7 +5,7 @@
 ## 🐇 Introduction 🐙
 Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OCR? We take a simple try to combine two off-the-shelf OCR models in [MMOCR](https://github.com/open-mmlab/mmocr) with SAM to develop some OCR-related application demos, including **[SAM for Text](#sam-for-text)**, **[Text Removal](#erasing)** and **[Text Inpainting](#inpainting)**. And we also provide a **[WebUI by gradio](#run-webui)** to give a better interaction.  
 
-*Note: We will continue to update and maintain this repo, and develop more OCR-related advanced applications demo to the community. **Welcome anyones to join who have the idea and want to contribute to our repo**.*
+*Note: **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
 ## 📅 Updates 👀
 - **2023.04.14**: 📣 Our repository is migrated to **[open-mmlab/playground](https://github.com/open-mmlab/playground#-mmocr-sam)**.
