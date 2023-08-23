@@ -8,6 +8,7 @@ Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OC
 *Note: **Welcome anyones to join who have the idea and want to contribute to our repo**.*
 
 ## 📅 Updates 👀
+- **2023.08.23**: 🔥 We creat a repo **[yeungchenwa/Recommendations-Diffusion-Text-Image](https://github.com/yeungchenwa/Recommendations-Diffusion-Text-Image)** to provide a paper collection of recent diffusion models for text-image generation tasks.
 - **2023.04.14**: 📣 Our repository is migrated to **[open-mmlab/playground](https://github.com/open-mmlab/playground#-mmocr-sam)**.
 - **2023.04.12**: Repository Release
 - **2023.04.12**: Supported the **[Inpainting](#inpainting🥸)** combined with DBNet++, SAM and ControlNet.
