@@ -5,10 +5,8 @@
 ## 🐇 Introduction 🐙
 Can [SAM](https://github.com/facebookresearch/segment-anything) be applied to OCR? We take a simple try to combine two off-the-shelf OCR models in [MMOCR](https://github.com/open-mmlab/mmocr) with SAM to develop some OCR-related application demos, including **[SAM for Text](#sam-for-text)**, **[Text Removal](#erasing)** and **[Text Inpainting](#inpainting)**. And we also provide a **[WebUI by gradio](#run-webui)** to give a better interaction.  
 
-*Note: **Welcome anyones to join who have the idea and want to contribute to our repo**.*
-
 ## 📅 Updates 👀
-- **2023.08.23**: 🔥 We creat a repo **[yeungchenwa/Recommendations-Diffusion-Text-Image](https://github.com/yeungchenwa/Recommendations-Diffusion-Text-Image)** to provide a paper collection of recent diffusion models for text-image generation tasks.
+- **2023.08.23**: 🔥 We create a repo **[yeungchenwa/Recommendations-Diffusion-Text-Image](https://github.com/yeungchenwa/Recommendations-Diffusion-Text-Image)** to provide a paper collection of recent diffusion models for text-image generation tasks.
 - **2023.04.14**: 📣 Our repository is migrated to **[open-mmlab/playground](https://github.com/open-mmlab/playground#-mmocr-sam)**.
 - **2023.04.12**: Repository Release
 - **2023.04.12**: Supported the **[Inpainting](#inpainting🥸)** combined with DBNet++, SAM and ControlNet.
@@ -95,7 +93,7 @@ mkdir checkpoints/ldm
 mv db_swin_mix_pretrain.pth checkpoints/mmocr
 ```
 
-Download the rest of checkpints to the related path (If you've done, ignore the following):
+Download the rest of the checkpoints to the related path (If you've done so, ignore the following):
 ```bash
 
 # mmocr recognizer ckpt
@@ -125,7 +123,7 @@ python mmocr_sam.py \
 
 ### **Erasing**🤓
 
-In this application demo, we use the [latent-diffusion-inpainting](https://github.com/CompVis/latent-diffusion#inpainting) to erase, or the [Stable-Diffusion-inpainting](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/inpaint) with text prompt to erase, which you can choose one of both by the parameter `--diffusion_model`. Also, you can choose whether to use the SAM ouput mask to erase by the parameter `--use_sam`. More implementation **details** are listed [here](docs/erase_details.md)
+In this application demo, we use the [latent-diffusion-inpainting](https://github.com/CompVis/latent-diffusion#inpainting) to erase, or the [Stable-Diffusion-inpainting](https://huggingface.co/docs/diffusers/api/pipelines/stable_diffusion/inpaint) with text prompt to erase, which you can choose one of both by the parameter `--diffusion_model`. Also, you can choose whether to use the SAM output mask to erase by the parameter `--use_sam`. More implementation **details** are listed [here](docs/erase_details.md)
 
 Run the following script:
 ```bash
@@ -152,7 +150,7 @@ python mmocr_sam_erase.py \
 
 **Run the WebUI**: see [here](#📺-run-webui-📱)
 
-**Note: The first time you run may cost some time, becasuse downloading the stable-diffusion ckpt cost a lot, wait patiently👀**
+**Note: The first time you run may cost some time, because downloading the stable-diffusion ckpt costs a lot, so wait patiently👀**
 
 ### **Inpainting**
 More implementation **details** are listed [here](docs/inpainting_details.md)
@@ -173,7 +171,7 @@ python mmocr_sam_inpainting.py \
 - `--select_index`: select the index of the text to inpaint.
 
 ### **Run WebUI**
-This repo also provides the WebUI(decided by gradio), inculding the Erasing and Inpainting.  
+This repo also provides the WebUI(decided by gradio), including the Erasing and Inpainting.  
 
 Before running the script, you should install the gradio package:
 ```bash
@@ -192,7 +190,7 @@ python mmocr_sam_erase_app.py
 **Erasing WebUI Result**
 ![](imgs/webui_erase_visit.png)  
 
-In our WebUI, user can interactly choose the SAM output and the diffusion model. Especially, user can choose which text to be erased.
+In our WebUI, users can interactly choose the SAM output and the diffusion model. Especially, users can choose which text to be erased.
 
 #### Inpainting🥸
 ```bash
@@ -203,7 +201,7 @@ python mmocr_sam_inpainting_app.py
 **Inpainting WebUI Result**
 ![](imgs/webui_inpainting_vis.png)
 
-**Note: Before you open the web, it may cost some time, wait patiently👀** 
+**Note: Before you open the web, it may take some time, so wait patiently👀** 
 
 ## 💗 Acknowledgement
 - [segment-anything](https://github.com/facebookresearch/segment-anything)
